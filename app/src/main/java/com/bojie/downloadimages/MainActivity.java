@@ -3,6 +3,7 @@ package com.bojie.downloadimages;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,6 +28,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private String[] listOfImages;
     private ProgressBar mProgressBar;
     private LinearLayout loadingSection = null;
+    private Handler mHandler;
 
 
     @Override
@@ -39,6 +41,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         listOfImages = getResources().getStringArray(R.array.imageUrls);
         mProgressBar = (ProgressBar) findViewById(R.id.downloadProgress);
         loadingSection = (LinearLayout) findViewById(R.id.loadingSection);
+        mHandler = new Handler();
 
     }
 
@@ -54,7 +57,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         myThread.start();
     }
 
-    public boolean downloadImageUsingThreads(String url) {
+    public boolean downloadImageUsingHandler(String url) {
 
         // 1.create the url object that represents the url
         // 2. open connection using that url object
@@ -89,7 +92,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            this.runOnUiThread(new Runnable() {
+            mHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     loadingSection.setVisibility(View.GONE);
@@ -126,13 +129,13 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         @Override
         public void run() {
-            MainActivity.this.runOnUiThread(new Runnable() {
+            mHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     loadingSection.setVisibility(View.VISIBLE);
                 }
             });
-            downloadImageUsingThreads(url);
+            downloadImageUsingHandler(url);
         }
     }
 }
