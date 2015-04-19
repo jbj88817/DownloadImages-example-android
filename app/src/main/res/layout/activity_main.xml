@@ -6,17 +6,19 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:paddingBottom="@dimen/activity_vertical_margin"
-                tools:context=".MainActivity">
+                tools:context=".MainActivity"
+                android:background="#ffcc00">
 
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/downLoadURL"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:background="#FFF"
-            android:focusable="false"/>
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/downLoadURL"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="#FFF"
+        android:focusable="false"
+        android:inputType="textUri"/>
 
 
     <Button
@@ -27,40 +29,26 @@
         android:layout_alignRight="@+id/downLoadURL"
         android:layout_below="@+id/downLoadURL"
         android:layout_margin="8dp"
-        android:background="#99cc00"
+        android:background="#33b5e5"
         android:text="Download Image"
         android:onClick="downLoadImage"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/loadingSection"
-        android:layout_below="@+id/downLoadImage"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/loadingMessage"
-            style="?android:attr/textAppearanceSmall"
-            android:gravity="center"
-            android:text="Loading..."/>
 
         <ProgressBar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/downloadProgress"
-            style="?android:attr/progressBarStyleSmall"
-            android:indeterminate="true"/>
-
-    </LinearLayout>
+            style="?android:attr/progressBarStyleHorizontal"
+            android:indeterminate="false"
+            android:layout_below="@+id/downLoadImage"
+            android:max="100"
+            android:visibility="gone"
+            />
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/urlList"
-        android:layout_below="@+id/loadingSection"
+        android:layout_below="@+id/downloadProgress"
         android:entries="@array/urls"
-        ></ListView>
+        android:background="#DDD"/>
 </RelativeLayout>

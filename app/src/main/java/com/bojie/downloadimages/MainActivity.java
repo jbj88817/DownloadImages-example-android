@@ -1,14 +1,13 @@
 package com.bojie.downloadimages;
 
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -23,119 +22,117 @@ import java.net.URL;
 
 public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener {
 
-    private EditText mEditText;
-    private ListView mListView;
+    private EditText selectionText;
+    private ListView chooseImagesList;
     private String[] listOfImages;
-    private ProgressBar mProgressBar;
-    private LinearLayout loadingSection = null;
-    private Handler mHandler;
+    private ProgressBar downloadImagesProgress;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mEditText = (EditText) findViewById(R.id.downLoadURL);
-        mListView = (ListView) findViewById(R.id.urlList);
-        mListView.setOnItemClickListener(this);
+        selectionText = (EditText) findViewById(R.id.downLoadURL);
+        chooseImagesList = (ListView) findViewById(R.id.urlList);
+        chooseImagesList.setOnItemClickListener(this);
         listOfImages = getResources().getStringArray(R.array.imageUrls);
-        mProgressBar = (ProgressBar) findViewById(R.id.downloadProgress);
-        loadingSection = (LinearLayout) findViewById(R.id.loadingSection);
-        mHandler = new Handler();
+        downloadImagesProgress = (ProgressBar) findViewById(R.id.downloadProgress);
 
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        mEditText.setText(listOfImages[position]);
+        selectionText.setText(listOfImages[position]);
     }
 
     public void downLoadImage(View view) {
-
-        String url = mEditText.getText().toString();
-        Thread myThread = new Thread(new DownloadImageThread(url));
-        myThread.start();
-    }
-
-    public boolean downloadImageUsingHandler(String url) {
-
-        // 1.create the url object that represents the url
-        // 2. open connection using that url object
-        // 3. read data using input stream into a byte array
-        // 4. open a file output stream to save data on sd card
-        // 5. write data to the fileoutputstream
-        // 6. close the connections
-
-        boolean successful = false;
-        URL downloadURL = null;
-        HttpURLConnection connection = null;
-        InputStream inputStream = null;
-        FileOutputStream fileOutputStream = null;
-        File file = null;
-        try {
-            downloadURL = new URL(url);
-            connection = (HttpURLConnection) downloadURL.openConnection();
-            inputStream = connection.getInputStream();
-
-            file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                    .getAbsolutePath() + "/" + Uri.parse(url).getLastPathSegment());
-            L.m("" + file.getAbsolutePath());
-            fileOutputStream = new FileOutputStream(file);
-            int read = -1;
-            byte[] buffer = new byte[1024];
-            while ((read = inputStream.read(buffer)) != -1) {
-                fileOutputStream.write(buffer, 0, read);
-            }
-            successful = true;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    loadingSection.setVisibility(View.GONE);
-                }
-            });
-            if (connection != null) {
-                connection.disconnect();
-            }
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (fileOutputStream != null) {
-                try {
-                    fileOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        if (selectionText.getText().toString().length() > 0) {
+            String url = selectionText.getText().toString();
+            MyTask myTask = new MyTask();
+            myTask.execute(url);
         }
-        return successful;
-
     }
 
-    private class DownloadImageThread implements Runnable {
+    class MyTask extends AsyncTask<String, Integer, Boolean> {
 
-        private String url;
-        public DownloadImageThread(String url) {
-            this.url = url;
+        private int contentLength = -1;
+        private int counter = 0;
+        private int calculatedProgress = 0;
+
+        @Override
+        protected void onPreExecute() {
+            downloadImagesProgress.setVisibility(View.VISIBLE);
         }
 
         @Override
-        public void run() {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    loadingSection.setVisibility(View.VISIBLE);
+        protected Boolean doInBackground(String... params) {
+            // 1.create the url object that represents the url
+            // 2. open connection using that url object
+            // 3. read data using input stream into a byte array
+            // 4. open a file output stream to save data on sd card
+            // 5. write data to the fileoutputstream
+            // 6. close the connections
+
+            boolean successful = false;
+            URL downloadURL = null;
+            HttpURLConnection connection = null;
+            InputStream inputStream = null;
+            FileOutputStream fileOutputStream = null;
+            File file = null;
+            try {
+                downloadURL = new URL(params[0]);
+                connection = (HttpURLConnection) downloadURL.openConnection();
+                contentLength = connection.getContentLength();
+                inputStream = connection.getInputStream();
+
+                file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                        .getAbsolutePath() + "/" + Uri.parse(params[0]).getLastPathSegment());
+                L.m("" + file.getAbsolutePath());
+                fileOutputStream = new FileOutputStream(file);
+                int read = -1;
+                byte[] buffer = new byte[1024];
+                while ((read = inputStream.read(buffer)) != -1) {
+                    fileOutputStream.write(buffer, 0, read);
+                    counter = counter + read;
+                  //  L.m("counter value is " + counter + " and contentLength is " + contentLength);
+                    publishProgress(counter);
                 }
-            });
-            downloadImageUsingHandler(url);
+                successful = true;
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (fileOutputStream != null) {
+                    try {
+                        fileOutputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return successful;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            calculatedProgress = (int) ((double) values[0] / contentLength) * 100;
+            downloadImagesProgress.setProgress(calculatedProgress);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            downloadImagesProgress.setVisibility(View.GONE);
         }
     }
 }
