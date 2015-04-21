@@ -12,7 +12,7 @@ import android.view.ViewGroup;
  */
 public class NonUITaskFragment extends Fragment {
 
-     MyTask myTask;
+    MyTask myTask;
     private Activity mActivity;
 
     public NonUITaskFragment() {

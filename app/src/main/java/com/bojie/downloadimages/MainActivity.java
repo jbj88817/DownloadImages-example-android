@@ -1,5 +1,6 @@
 package com.bojie.downloadimages;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
@@ -35,6 +36,11 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         } else {
             mFragment = (NonUITaskFragment) getSupportFragmentManager().findFragmentByTag("TaskFragment");
         }
+        if(mFragment != null){
+            if(mFragment.myTask != null && mFragment.myTask.getStatus() == AsyncTask.Status.RUNNING) {
+                downloadImagesProgress.setVisibility(View.VISIBLE);
+            }
+        }
 
     }
 
@@ -68,6 +74,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     }
 
     public void updateProgress(int progress) {
-
+        downloadImagesProgress.setProgress(progress);
     }
 }

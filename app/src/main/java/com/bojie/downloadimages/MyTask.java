@@ -39,7 +39,10 @@ public class MyTask extends AsyncTask<String, Integer, Boolean> {
 
     @Override
     protected void onPreExecute() {
-        ((MainActivity)mActivity).showProgressBarBeforeDownloading();
+        if(mActivity != null){
+            ((MainActivity)mActivity).showProgressBarBeforeDownloading();
+        }
+
     }
 
     @Override
@@ -104,11 +107,19 @@ public class MyTask extends AsyncTask<String, Integer, Boolean> {
 
     @Override
     protected void onProgressUpdate(Integer... values) {
-        calculatedProgress = (int) ((double) values[0] / contentLength) * 100;
+
+        if(mActivity == null){
+            L.m("Skipping Progress Update Since activity is null");
+        } else {
+            calculatedProgress = (int) ((double) values[0] / contentLength) * 100;
+            ((MainActivity)mActivity).updateProgress(calculatedProgress);
+        }
     }
 
     @Override
     protected void onPostExecute(Boolean aBoolean) {
-        ((MainActivity)mActivity).hideProgressBarAfterDownloading();
+        if(mActivity != null){
+            ((MainActivity)mActivity).hideProgressBarAfterDownloading();
+        }
     }
 }
