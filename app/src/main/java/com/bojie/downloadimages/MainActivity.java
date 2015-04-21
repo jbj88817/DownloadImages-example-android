@@ -19,7 +19,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private NonUITaskFragment mFragment;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,14 +29,14 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         listOfImages = getResources().getStringArray(R.array.imageUrls);
         downloadImagesProgress = (ProgressBar) findViewById(R.id.downloadProgress);
 
-        if (savedInstanceState == null){
+        if (savedInstanceState == null) {
             mFragment = new NonUITaskFragment();
             getSupportFragmentManager().beginTransaction().add(mFragment, "TaskFragment").commit();
         } else {
             mFragment = (NonUITaskFragment) getSupportFragmentManager().findFragmentByTag("TaskFragment");
         }
-        if(mFragment != null){
-            if(mFragment.myTask != null && mFragment.myTask.getStatus() == AsyncTask.Status.RUNNING) {
+        if (mFragment != null) {
+            if (mFragment.myTask != null && mFragment.myTask.getStatus() == AsyncTask.Status.RUNNING) {
                 downloadImagesProgress.setVisibility(View.VISIBLE);
             }
         }
@@ -56,18 +55,18 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         }
     }
 
-    public void showProgressBarBeforeDownloading(){
-        if(mFragment.myTask != null) {
+    public void showProgressBarBeforeDownloading() {
+        if (mFragment.myTask != null) {
             if (downloadImagesProgress.getVisibility() != View.VISIBLE
-                    && downloadImagesProgress.getProgress() != downloadImagesProgress.getMax()){
+                    && downloadImagesProgress.getProgress() != downloadImagesProgress.getMax()) {
                 downloadImagesProgress.setVisibility(View.VISIBLE);
             }
         }
     }
 
-    public void hideProgressBarAfterDownloading(){
-        if(mFragment.myTask != null){
-            if(downloadImagesProgress.getVisibility() == View.VISIBLE) {
+    public void hideProgressBarAfterDownloading() {
+        if (mFragment.myTask != null) {
+            if (downloadImagesProgress.getVisibility() == View.VISIBLE) {
                 downloadImagesProgress.setVisibility(View.GONE);
             }
         }

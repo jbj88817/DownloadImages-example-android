@@ -9,7 +9,7 @@ import android.widget.Toast;
  */
 public class L {
 
-    public static void m(String message){
+    public static void m(String message) {
         Log.d("Bojie", message);
     }
 

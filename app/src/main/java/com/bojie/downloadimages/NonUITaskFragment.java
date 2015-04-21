@@ -108,6 +108,4 @@ public class NonUITaskFragment extends Fragment {
         }
         L.m("Fragment onDetach");
     }
-
-
 }
